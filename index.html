@@ -1,9 +1,10 @@
-                <!DOCTYPE html>
+
+           <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ساعتي الاحترافية</title>
+    <title>ساعة عمر المتكاملة</title>
     <style>
         body {
             background-color: #1a1a1a;
@@ -15,7 +16,7 @@
             height: 100vh;
             margin: 0;
             font-family: Arial, sans-serif;
-            transition: background 0.5s; /* لجعل انتقال الألوان ناعماً */
+            transition: background 0.5s;
         }
         #clock {
             font-size: 50px;
@@ -36,12 +37,23 @@
             border-radius: 8px;
             margin-bottom: 30px;
         }
-        .social-links a {
-            color: #00d4ff;
-            text-decoration: none;
-            margin: 0 10px;
-            font-size: 20px;
+        .social-links {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
         }
+        .social-links a {
+            padding: 10px 20px;
+            text-decoration: none;
+            color: white;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .fb { background-color: #1877f2; }
+        .ms { background-color: #0084ff; }
+        .yt { background-color: #ff0000; }
+        .gg { background-color: #4285f4; }
     </style>
 </head>
 <body>
@@ -51,26 +63,4 @@
     <button class="btn-change" onclick="changeColor()">تغيير ثيم الساعة</button>
 
     <div class="social-links">
-        <a href="#">Facebook</a>
-        <a href="#">Messenger</a>
-    </div>
-
-    <script>
-        // دالة تحديث الوقت
-        function updateClock() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString();
-            document.getElementById('clock').textContent = timeString;
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
-
-        // دالة تغيير لون الخلفية
-        function changeColor() {
-            const colors = ['#1a1a1a', '#2c3e50', '#8e44ad', '#27ae60', '#d35400', '#2980b9'];
-            const randomColor = colors[Math.floor(Math.random() * colors.length)];
-            document.body.style.backgroundColor = randomColor;
-        }
-    </script>
-</body>
-</html>ms:
+        <a href="
