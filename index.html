@@ -1,59 +1,76 @@
-<!DOCTYPE html>
+                <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>موقع عمر المطور</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ساعتي الاحترافية</title>
     <style>
-        /* تنسيق الصفحة والخلفية */
-        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; display: flex; justify-content: center; align-items: center; font-family: Arial, sans-serif; }
-        
-        /* كود الفيديو لملء الخلفية */
-        #bg-video { position: fixed; right: 0; bottom: 0; min-width: 100%; min-height: 100%; z-index: -1; object-fit: cover; }
-
-        /* تصميم البطاقة الزجاجية الاحترافي */
-        .card {
-            background: rgba(255, 255, 255, 0.75); 
-            backdrop-filter: blur(15px); 
-            padding: 40px; border-radius: 30px; text-align: center; width: 380px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.3);
+        body {
+            background-color: #1a1a1a;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items:   center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            transition: background 0.5s; /* لجعل انتقال الألوان ناعماً */
         }
-
-        #clock { font-size: 45px; color: #1565c0; margin: 20px 0; font-weight: bold; }
-        
-        /* تنسيق الأزرار */
-        .btn { display: block; padding: 12px; margin: 10px 0; color: white; text-decoration: none; border-radius: 12px; font-weight: bold; transition: all 0.3s ease; }
-        .btn-youtube { background-color: #ff0000; }
-        .btn-google { background-color: #4285f4; }
-        .btn-facebook { background-color: #1877f2; } /* لون فيسبوك الرسمي */
-        .btn-messenger { background: linear-gradient(45deg, #0084FF, #A033FF); }
-        .btn:hover { transform: scale(1.05); filter: brightness(1.1); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        #clock {
+            font-size: 50px;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+        }
+        .btn-change {
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .social-links a {
+            color: #00d4ff;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 20px;
+        }
     </style>
 </head>
 <body>
 
-    <video autoplay muted loop id="bg-video">
-        <source src="https://assets.mixkit.co/videos/preview/mixkit-abstract-technology-connection-dots-and-lines-15866-large.mp4" type="video/mp4">
-    </video>
+    <div id="clock">00:00:00</div>
+    
+    <button class="btn-change" onclick="changeColor()">تغيير ثيم الساعة</button>
 
-    <div class="card">
-        <h1 style="color: #1565c0;">مرحباً بك يا عمر 🚀</h1>
-        <div id="clock">00:00:00</div>
-        
-
-        <a href="https://www.messenger.com" target="_blank" class="btn btn-messenger">Messenger</a> 
-        <a href="https://www.facebook.com" target="_blank" class="btn btn-facebook">Facebook</a> 
-        <a href="https://www.youtube.com" target="_blank" class="btn btn-youtube">YouTube</a>
-        <a href="https://www.google.com" target="_blank" class="btn btn-google">Google</a>
+    <div class="social-links">
+        <a href="#">Facebook</a>
+        <a href="#">Messenger</a>
     </div>
 
     <script>
-        /* كود الساعة التفاعلية */
+        // دالة تحديث الوقت
         function updateClock() {
-            document.getElementById('clock').innerText = new Date().toLocaleTimeString('ar-EG');
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            document.getElementById('clock').textContent = timeString;
         }
         setInterval(updateClock, 1000);
         updateClock();
+
+        // دالة تغيير لون الخلفية
+        function changeColor() {
+            const colors = ['#1a1a1a', '#2c3e50', '#8e44ad', '#27ae60', '#d35400', '#2980b9'];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            document.body.style.backgroundColor = randomColor;
+        }
     </script>
 </body>
-</html>
+</html>ms:
