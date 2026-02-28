@@ -1,65 +1,82 @@
-
-
-عمر
                 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ساعة عمر مع منبه الفجر</title>
+    <title>تطبيق عمر الذكي</title>
     <style>
-        body { background: #1a1a1a; color: white; display: flex; flex-direction: column; align-items:   center; justify-content: center; min-height: 100vh; margin: 0; font-family: sans-serif; transition: 0.5s; }
-        #clock { font-size: 50px; font-weight: bold; background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; margin-bottom: 10px; }
-        .alarm-section { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center; border: 1px solid #444; }
-        input[type="time"] { padding: 8px; border-radius: 5px; border: none; font-size: 16px; margin-top: 10px; }
-        button { padding: 10px 20px; cursor: pointer; border-radius: 20px; border: none; margin: 10px; font-weight: bold; background: #fff; color: #000; }
-        .links { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .links a { padding: 15px 20px; color: white; text-decoration: none; border-radius: 10px; text-align: center; font-weight: bold; font-size: 14px; }
+        body { background: #1a1a1a; color: white; display: flex; flex-direction: column; align-items:   center; justify-content: center; min-height: 100vh; margin: 0; font-family: sans-serif; transition: 0.5s; text-align: center; }
+        #clock { font-size: 50px; font-weight: bold; margin-top: 10px; }
+        #date { font-size: 18px; color: #aaa; margin-bottom: 20px; }
+        .info-bar { background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 50px; margin-bottom: 20px; font-size: 16px; }
+        .alarm-box { background: #333; padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #444; width: 80%; max-width: 300px; }
+        input[type="time"] { padding: 10px; border-radius: 8px; border: none; width: 80%; margin-top: 10px; font-size: 18px; }
+        .btn-color { padding: 10px 20px; cursor: pointer; border-radius: 20px; border: none; margin: 10px; font-weight: bold; background: #fff; }
+        .links { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 90%; max-width: 400px; }
+        .links a { padding: 15px; color: white; text-decoration: none; border-radius: 12px; text-align: center; font-weight: bold; font-size: 14px; }
         .fb { background: #1877f2; } .ms { background: #0084ff; } .yt { background: #ff0000; } .gg { background: #4285f4; }
     </style>
 </head>
 <body>
 
-    <div id="clock">00:00:00</div>
+    <div class="info-bar">🌡️ درجة الحرارة الآن: <span id="temp">22°C</span></div>
 
-    <div class="alarm-section">
-        <div>🔔 اضبط منبه صلاة الفجر:</div>
+    <div id="clock">00:00:00</div>
+    <div id="date">التاريخ اليوم</div>
+
+    <div class="alarm-box">
+        <div>🔔 اضبط منبه الفجر</div>
         <input type="time" id="alarmTime">
-        <div id="alarmStatus" style="font-size: 12px; margin-top: 5px; color: #aaa;">المنبه غير مفعل</div>
+        <p id="status" style="font-size: 12px; color: #00ff00;"></p>
     </div>
 
-    <button onclick="document.body.style.backgroundColor='#'+Math.floor(Math.random()*16777215).toString(16)">🎨 غير لون الخلفية</button>
+    <button class="btn-color" onclick="changeBG()">🎨 تغيير الثيم</button>
 
     <div class="links">
-        <a href="https://facebook.com" target="_blank" class="fb">Facebook</a>
-        <a href="https://messenger.com" target="_blank" class="ms">Messenger</a>
-        <a href="https://youtube.com" target="_blank" class="yt">YouTube</a>
-        <a href="https://google.com" target="_blank" class="gg">Google</a>
+      <a href="https://facebook.com" class="fb">Facebook</a>
+        <a href="https://messenger.com" class="ms">Messenger</a>
+        <a href="https://youtube.com" class="yt">YouTube</a>
+        <a href="https://google.com" class="gg">Google</a>
     </div>
 
-    <audio id="alarmAudio" src="https://www.soundjay.com/buttons/beep-01a.mp3" preload="auto"></audio>
-
     <script>
-        function updateClock() {
+        // دالة تحديث الوقت والتاريخ
+        function updateAll() {
             const now = new Date();
-            const timeString = now.toLocaleTimeString('en-GB', { hour12: false }); // نظام 24 ساعة
             document.getElementById('clock').textContent = now.toLocaleTimeString();
             
-            // تحقق من المنبه
+            // تحديث اليومية
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('date').textContent = now.toLocaleDateString('ar-EG', options);
+
+            // فحص المنبه
             const alarmInput = document.getElementById('alarmTime').value;
-            const currentTimeShort = timeString.substring(0, 5); // يأخذ الساعات والدقائق فقط
-            
-            if (alarmInput === currentTimeShort) {
-                document.getElementById('alarmAudio').play();
-                document.getElementById('alarmStatus').textContent = "⏰ حان وقت الصلاة!";
-                document.getElementById('alarmStatus').style.color = "#27ae60";
+            const currentShortTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+
+            if (alarmInput === currentShortTime) {
+                speak();
             }
         }
 
-        setInterval(updateClock, 1000);
+        // دالة جعل الهاتف ينطق "عمر عمر استيقظ"
+        function speak() {
+            if ('speechSynthesis' in window) {
+                const msg = new SpeechSynthesisUtterance("عمر عمر عمر استيقظ حان وقت الفجر");
+                msg.lang = 'ar-SA';
+                // نجعله يكرر الكلام إذا لم يتم إغلاقه
+                if (!window.speechSynthesis.speaking) {
+                    window.speechSynthesis.speak(msg);
+                }
+            }
+        }
 
-        // تنبيه للمستخدم لتفعيل الصوت
-        document.body.onclick = () => { document.getElementById('alarmAudio').load(); };
+        // تغيير الخلفية
+        function changeBG() {
+            document.body.style.backgroundColor = '#' + Math.floor(Math.random()*16777215).toString(16);
+        }
+
+        setInterval(updateAll, 1000);
+        updateAll();
     </script>
 </body>
-</html>ms:
+</html>  
