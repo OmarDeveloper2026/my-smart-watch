@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -56,12 +57,12 @@
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const seconds = String(now.getSeconds()).padStart(2, '0');
             
-            document.getElementById('clock').innerText = '${hours}:${minutes}:${seconds}';
+            document.getElementById('clock').innerText = hours + ":" + minutes + ":" + seconds;
             document.getElementById('date').innerText = now.toLocaleDateString('ar-EG', {weekday:'long', day:'numeric', month:'long'});
 
             // فحص المنبه
             const saved = localStorage.getItem('omar_v4');
-            const currentShort = '${hours}:${minutes}';
+            const currentShort = '{hours}:{minutes}';
 
             if (saved === currentShort && now.getSeconds() === 0 && !active) {
                 playAlm();
