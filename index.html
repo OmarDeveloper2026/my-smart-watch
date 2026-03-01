@@ -3,95 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق عمر الاحترافي</title>
+    <title>تطبيق عمر - النسخة الاحترافية</title>
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <style>
-        body { background: #1a1a1a; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; font-family: sans-serif; transition: 0.5s; text-align: center; }
-        #clock { font-size: 60px; font-weight: bold; text-shadow: 0 0 20px rgba(255,255,255,0.2); }
-        #date { font-size: 18px; color: #aaa; margin-bottom: 15px; }
-        .temp-box { background: rgba(255,255,255,0.1); padding: 8px 20px; border-radius: 50px; margin-bottom: 15px; font-size: 16px; border: 1px solid #444; }
-        .alarm-box { background: #252525; padding: 20px; border-radius: 20px; margin-bottom: 20px; border: 2px solid #0084ff; width: 85%; max-width: 320px; }
-        input[type="time"] { padding: 12px; border-radius: 10px; border: none; width: 90%; font-size: 20px; text-align: center; background: #fff; }
-        .links { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 90%; max-width: 400px; }
-        .links a { padding: 15px; color: white; text-decoration: none; border-radius: 15px; text-align: center; font-weight: bold; font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        body { background: #1a1a1a; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; font-family: sans-serif; transition: 0.5s; text-align: center; overflow: hidden; }
+        #clock { font-size: 65px; font-weight: bold; color: #00d4ff; text-shadow: 0 0 15px rgba(0,212,255,0.5); }
+        #date { font-size: 20px; color: #888; margin-bottom: 20px; }
+        .temp-bar { background: rgba(255,255,255,0.1); padding: 10px 25px; border-radius: 50px; margin-bottom: 20px; font-size: 18px; border: 1px solid #333; }
+        .alarm-area { background: #222; padding: 20px; border-radius: 25px; margin-bottom: 25px; border: 2px solid #00d4ff; width: 80%; max-width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        input[type="time"] { padding: 10px; border-radius: 12px; border: none; width: 100%; font-size: 22px; text-align: center; background: #fff; color: #000; box-sizing: border-box; }
+        .links-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 90%; max-width: 400px; }
+        .links-grid a { padding: 15px; color: white; text-decoration: none; border-radius: 15px; text-align: center; font-weight: bold; font-size: 14px; transition: 0.3s; }
         .fb { background: #1877f2; } .ms { background: #0084ff; } .yt { background: #ff0000; } .gg { background: #4285f4; }
-        .btn-theme { background: none; border: 1px solid #666; color: #666; padding: 5px 15px; border-radius: 20px; margin-top: 15px; cursor: pointer; }
+        .links-grid a:active { transform: scale(0.9); }
     </style>
 </head>
-<body onclick="enableAudio()">
+<body onclick="startAudio()">
 
-    <div class="temp-box">🌡️ الحرارة في منطقتك: <span id="temp">24°C</span></div>
+    <div class="temp-bar">🌡️ <span id="temp">جاري التحديد...</span></div>
     <div id="clock">00:00:00</div>
-    <div id="date">التاريخ</div>
+    <div id="date">-- --- ----</div>
 
-    <div class="alarm-box">
-        <div>⏰ منبه الفجر (محفوظ)</div>
-        <input type="time" id="alarmTime" onchange="saveAlarm()">
-        <div id="alarmStatus" style="font-size: 12px; margin-top: 8px; color: #00ff00;"></div>
+    <div class="alarm-area">
+        <div style="margin-bottom: 10px;">🔔 منبه الفجر الثابت</div>
+        <input type="time" id="alarmTime" onchange="setNewAlarm()">
+        <div id="msg" style="font-size: 12px; margin-top: 10px; color: #00ff00;"></div>
     </div>
 
-    <div class="links">
-        <a href="https://facebook.com" target="_blank" class="fb">Facebook</a>
-        <a href="https://messenger.com" target="_blank" class="ms">Messenger</a>
-        <a href="https://youtube.com" target="_blank" class="yt">YouTube</a>
-        <a href="https://google.com" target="_blank" class="gg">Google</a>
+    <div class="links-grid">
+        <a href="https://facebook.com" class="fb">Facebook</a>
+        <a href="https://messenger.com" class="ms">Messenger</a>
+        <a href="https://youtube.com" class="yt">YouTube</a>
+        <a href="https://google.com" class="gg">Google</a>
     </div>
-
-    <button class="btn-theme" onclick="document.body.style.backgroundColor='#'+Math.floor(Math.random()*16777215).toString(16)">تغيير الخلفية</button>
 
     <script>
-        // 1. حفظ واسترجاع المنبه تلقائياً
-        function saveAlarm() {
-            const time = document.getElementById('alarmTime').value;
-            localStorage.setItem('fajrAlarm', time);
-            document.getElementById('alarmStatus').textContent = "تم حفظ المنبه بنجاح ✅";
-        }
-
-        function loadAlarm() {
-            const savedTime = localStorage.getItem('fajrAlarm');
-            if (savedTime) {
-                document.getElementById('alarmTime').value = savedTime;
-            }
-        }
-
-        // 2. الصوت الاحترافي (عمر.. عمر.. استيقظ)
-        function playAlarm() {
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance("عمر . . عمر . . عمر استيقظ حان وقت الفجر");
-                utterance.lang = 'ar-SA';
-                utterance.rate = 0.8; // جعل الصوت أثقل وأخشن قليلاً
-                utterance.pitch = 0.9; 
-                window.speechSynthesis.speak(utterance);
-            }
-        }
-
-        // 3. تحديث الوقت وفحص المنبه
-        function update() {
+        // 1. تشغيل الساعة بدون إنترنت
+        function updateDisplay() {
             const now = new Date();
-            document.getElementById('clock').textContent = now.toLocaleTimeString();
+            document.getElementById('clock').textContent = now.toLocaleTimeString('ar-EG');
             document.getElementById('date').textContent = now.toLocaleDateString('ar-EG', {weekday:'long', day:'numeric', month:'long'});
 
-            const savedAlarm = localStorage.getItem('fajrAlarm');
-            const currentTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
-
-            if (savedAlarm === currentTime && now.getSeconds() === 0) {
-                playAlarm();
+            // فحص المنبه
+            const saved = localStorage.getItem('omar_fajr');
+            const current = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+            
+            if (saved === current && now.getSeconds() === 0) {
+                shout();
             }
         }
 
-        // 4. تفعيل الصوت (ضروري لمتصفحات الجوال)
-        function enableAudio() {
-            window.speechSynthesis.cancel(); 
-            console.log("Audio Enabled");
+        // 2. المنبه يحفظ للأبد في الهاتف
+        function setNewAlarm() {
+            const t = document.getElementById('alarmTime').value;
+            localStorage.setItem('omar_fajr', t);
+            document.getElementById('msg').textContent = "تم الحفظ بنجاح ✅";
         }
 
-        setInterval(update, 1000);
-        loadAlarm();
-        update();
+        // 3. صوت رجل قوي مع التوقفات التي طلبتها
+        function shout() {
+            if ('speechSynthesis' in window) {
+                const text = "عمر . . . عمر . . . عمر استيقظ حان وقت الفجر";
+                const speech = new SpeechSynthesisUtterance(text);
+                speech.lang = 'ar-SA';
+                speech.rate = 0.7; // صوت بطيء وخشين
+                speech.pitch = 0.5; // صوت رجل عميق
+                speech.volume = 1;
+                window.speechSynthesis.speak(speech);
+            }
+        }
 
-        // تجربة جلب الحرارة (تحتاج إنترنت أول مرة فقط)
-        fetch('https://wttr.in/?format=%t').then(res => res.text()).then(data => {
-            if(data) document.getElementById('temp').textContent = data;
-        }).catch(() => {});
+        // 4. جلب الحرارة (تخزين آخر درجة حرارة للعمل بدون إنترنت)
+        async function getTemp() {
+            try {
+                const res = await fetch('https://wttr.in/?format=%t');
+                const data = await res.text();
+                if (data && !data.includes("Unknown")) {
+                    document.getElementById('temp').textContent = "الحرارة الآن: " + data;
+                    localStorage.setItem('last_temp', data);
+                }
+            } catch (e) {
+                const last = localStorage.getItem('last_temp');
+                document.getElementById('temp').textContent = last ? "الحرارة (آخر تحديث): " + last : "تحتاج إنترنت للحرارة";
+            }
+        }
+
+        function startAudio() { window.speechSynthesis.cancel(); }
+
+        setInterval(updateDisplay, 1000);
+        
+        // تحميل المنبه المحفوظ عند الفتح
+        const savedTime = localStorage.getItem('omar_fajr');
+        if (savedTime) document.getElementById('alarmTime').value = savedTime;
+        
+        getTemp();
+        updateDisplay();
     </script>
 </body>
 </html>
