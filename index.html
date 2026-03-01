@@ -3,67 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام عمر الاحترافي</title>
+    <title>نظام عمر الذكي v3</title>
     <style>
         body { background: #0a0a0a; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; font-family: sans-serif; }
-        #clock { font-size: 60px; font-weight: bold; color: #00d4ff; font-family: monospace; }
-        .panel { background: #151515; padding: 20px; border-radius: 25px; border: 2px solid #00d4ff; width: 85%; max-width: 350px; text-align: center; }
-        input[type="time"] { padding: 12px; border-radius: 12px; width: 90%; font-size: 24px; margin: 10px 0; }
+        #clock { font-size: 60px; font-weight: bold; color: #00d4ff; font-family: monospace; text-shadow: 0 0 15px rgba(0,212,255,0.4); }
+        .panel { background: #151515; padding: 20px; border-radius: 25px; border: 2px solid #00d4ff; width: 85%; max-width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        input[type="time"] { padding: 12px; border-radius: 12px; width: 90%; font-size: 24px; margin: 10px 0; border: none; }
+        .music-btn { background: #333; color: #00d4ff; padding: 8px; border-radius: 10px; display: inline-block; cursor: pointer; font-size: 12px; margin-top: 10px; border: 1px solid #00d4ff; }
         .links { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 90%; max-width: 400px; margin-top: 20px; }
         .links a { padding: 15px; color: white; text-decoration: none; border-radius: 12px; font-weight: bold; text-align: center; }
         .fb { background: #1877f2; } .ms { background: #0084ff; } .yt { background: #ff0000; } .gg { background: #4285f4; }
-        #stopBtn { display: none; background: #ff4757; color: white; padding: 15px; border-radius: 50px; width: 200px; border: none; font-weight: bold; margin-top: 15px; }
+        #stopBtn { display: none; background: #ff4757; color: white; padding: 15px; border-radius: 50px; width: 220px; border: none; font-weight: bold; margin-top: 15px; cursor: pointer; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% {transform: scale(1);} 50% {transform: scale(1.05);} 100% {transform: scale(1);} }
     </style>
 </head>
-<body onclick="document.getElementById('alarmAudio').load()">
+<body onclick="unlockAudio()">
+
     <div style="margin-bottom:10px">🌡️ <span id="temp">24°C</span></div>
     <div id="clock">00:00:00</div>
     <div id="date" style="color:#888; margin-bottom:20px">التاريخ</div>
+
     <div class="panel">
         <div>⏰ منبه الفجر (محفوظ)</div>
-        <input type="time" id="alarmTime" onchange="localStorage.setItem('o_a', this.value)">
-        <input type="file" id="m" accept="audio/*" onchange="loadM(event)">
-        <p style="font-size:10px">اختر نغمة (اختياري)</p>
+        <input type="time" id="alarmTime" onchange="saveAlarm()">
+        <label class="music-btn">🎵 اختر رنة من جهازك
+            <input type="file" id="musicFile" accept="audio/*" style="display:none" onchange="loadMusic(event)">
+        </label>
+        <p id="audioStatus" style="font-size:10px; color:#888;">المنبه جاهز</p>
     </div>
-    <button id="stopBtn" onclick="stopA()">🛑 إيقاف المنبه</button>
+
+    <button id="stopBtn" onclick="stopAlarm()">🛑 إيقاف المنبه الآن</button>
+
     <div class="links">
         <a href="https://facebook.com" class="fb">Facebook</a>
         <a href="https://messenger.com" class="ms">Messenger</a>
         <a href="https://youtube.com" class="yt">YouTube</a>
         <a href="https://google.com" class="gg">Google</a>
     </div>
+
     <audio id="alarmAudio" loop></audio>
+
     <script>
-        let hasM = false;
-        function loadM(e) {
-            const r = new FileReader();
-            r.onload = function(ex) { document.getElementById('alarmAudio').src = ex.target.result; hasM = true; alert("جاهز! 🎵"); };
-            r.readAsDataURL(e.target.files[0]);
+        let hasCustomMusic = false;
+        let alarmActive = false;
+
+        // فتح قفل الصوت (ضروري جداً)
+        function unlockAudio() {
+            window.speechSynthesis.cancel();
+            document.getElementById('audioStatus').textContent = "تم تفعيل الصوت بنجاح ✅";
+            document.getElementById('audioStatus').style.color = "#00ff00";
         }
+
+        function loadMusic(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('alarmAudio').src = e.target.result;
+                hasCustomMusic = true;
+                alert("تم تحميل رنتك الخاصة! 🎵");
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function saveAlarm() {
+            localStorage.setItem('omar_alarm_v3', document.getElementById('alarmTime').value);
+        }
+
         function tick() {
-            const n = new Date();
-            document.getElementById('clock').textContent = n.toLocaleTimeString('en-GB');
-            document.getElementById('date').textContent = n.toLocaleDateString('ar-EG',{weekday:'long',day:'numeric',month:'long'});
-            const s = localStorage.getItem('o_a');
-            const c = n.getHours().toString().padStart(2,'0')+":"+n.getMinutes().toString().padStart(2,'0');
-            if(s === c && n.getSeconds() === 0) startA();
+            const now = new Date();
+            document.getElementById('clock').textContent = now.toLocaleTimeString('en-GB');
+            document.getElementById('date').textContent = now.toLocaleDateString('ar-EG', {weekday:'long', day:'numeric', month:'long'});
+
+            const savedAlarm = localStorage.getItem('omar_alarm_v3');
+            const currentTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+
+            if (savedAlarm === currentTime && now.getSeconds() === 0 && !alarmActive) {
+                startAlarm();
+            }
         }
-        function startA() {
-            if(!hasM) {
-                const sp = new SpeechSynthesisUtterance("عمر . . عمر . . استيقظ حان وقت الفجر");
-                sp.lang = 'ar-SA'; sp.rate = 0.7; sp.pitch = 0.5;
-                window.speechSynthesis.speak(sp);
-            } else { document.getElementById('alarmAudio').play(); }
+
+        function startAlarm() {
+            alarmActive = true;
             document.getElementById('stopBtn').style.display = 'block';
+            
+            if (hasCustomMusic) {
+                document.getElementById('alarmAudio').play();
+            } else {
+                // تكرار النطق
+                speakLoop();
+            }
         }
-        function stopA() {
+
+        function speakLoop() {
+            if (!alarmActive) return;
+            const speech = new SpeechSynthesisUtterance("عمر . . . عمر . . . استيقظ حان وقت الفجر");
+            speech.lang = 'ar-SA';
+            speech.rate = 0.7;
+            speech.pitch = 0.5;
+            speech.onend = function() { if(alarmActive) speakLoop(); }; // تكرار تلقائي
+            window.speechSynthesis.speak(speech);
+        }
+
+        function stopAlarm() {
+            alarmActive = false;
             document.getElementById('alarmAudio').pause();
             window.speechSynthesis.cancel();
             document.getElementById('stopBtn').style.display = 'none';
         }
+
         setInterval(tick, 1000);
-        const sv = localStorage.getItem('o_a');
-        if(sv) document.getElementById('alarmTime').value = sv;
+        const saved = localStorage.getItem('omar_alarm_v3');
+        if (saved) document.getElementById('alarmTime').value = saved;
         tick();
     </script>
 </body>
